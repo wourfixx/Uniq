@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><title>Uniq Pro — уникализатор видео</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#eef0f7;--card:#fff;--tx:#12131f;--mu:#6b6f86;--ac:#7c5cff;--ac2:#18c4e8;--bd:#dcdfec;--in:#f3f4fa}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#090a12;--card:#13151f;--tx:#eef0fb;--mu:#8a8fa8;--bd:#23263a;--in:#0d0f18}}
+:root[data-theme="dark"]{--bg:#090a12;--card:#13151f;--tx:#eef0fb;--mu:#8a8fa8;--bd:#23263a;--in:#0d0f18}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 -apple-system,system-ui,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
+.app{max-width:1000px;margin:0 auto;padding:16px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.logo{font-weight:800;font-size:22px;letter-spacing:-.5px}.logo b{background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.chip{font-size:12px;padding:5px 10px;border-radius:20px;background:var(--card);border:1px solid var(--bd);color:var(--mu)}
+.grid{display:grid;gap:14px}@media(min-width:820px){.grid{grid-template-columns:1fr 1fr;align-items:start}.sticky{position:sticky;top:16px}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:22px;padding:16px;margin-bottom:14px}
+h3{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);display:flex;gap:8px;align-items:center}
+h3 i{font-style:normal;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px}
+.stage{background:var(--in);border-radius:18px;min-height:340px;display:grid;place-items:center;padding:12px;position:relative}
+canvas{max-width:100%;max-height:62vh;border-radius:12px;box-shadow:0 10px 40px #0006;display:none;background:#000}
+.empty{text-align:center;color:var(--mu);cursor:pointer;padding:30px}.empty b{display:block;color:var(--tx);font-size:18px;margin:8px 0 4px}.empty span.ic{font-size:40px}
+input[type=file]{position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none}
+.bar2{display:flex;gap:8px;margin-top:10px;align-items:center;color:var(--mu);font-size:13px}
+.bar2 button{border:1px solid var(--bd);background:var(--in);color:var(--tx);border-radius:12px;padding:8px 14px;font:inherit}
+.seg{display:flex;background:var(--in);border-radius:13px;padding:3px;gap:3px;margin-bottom:10px}
+.seg button{flex:1;border:0;background:none;color:var(--mu);padding:10px 4px;border-radius:10px;font:600 13px inherit;display:flex;flex-direction:column;align-items:center;gap:2px}
+.seg button small{font-weight:400;font-size:10px;opacity:.8}
+.seg button.on{background:var(--card);color:var(--tx);box-shadow:0 1px 6px #0004}
+.lbl{font-size:12px;color:var(--mu);margin:4px 0 6px}
+.tg{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+.sw{width:46px;height:28px;border-radius:14px;background:var(--bd);border:0;position:relative;transition:.2s}.sw:after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}.sw.on{background:var(--ac)}.sw.on:after{left:21px}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px;background:var(--in);border-radius:14px;padding:12px}dt{color:var(--mu)}dd{margin:0;text-align:right;word-break:break-all}
+.go{width:100%;border:0;border-radius:18px;padding:17px;font:700 17px inherit;color:#fff;background:linear-gradient(90deg,var(--ac),var(--ac2));box-shadow:0 8px 24px #7c5cff55}.go:disabled{opacity:.35;box-shadow:none}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.b2{border:1px solid var(--bd);background:var(--in);color:var(--tx);padding:14px;border-radius:16px;font:600 15px inherit}
+.hide{display:none!important}
+.bar{height:14px;background:var(--in);border-radius:8px;overflow:hidden;margin:10px 0}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .9s linear}
+.st{display:flex;justify-content:space-between;color:var(--mu);font-size:13px}.st b{color:var(--tx)}
+.note{font-size:12px;color:var(--mu);margin:8px 0 0}
+#out{width:100%;max-height:50vh;border-radius:14px;background:#000}
+</style></head><body><div class="app">
+<input type="file" id="f" accept="video/*,.mov,.mp4,.m4v">
+<header><div class="logo">Uniq<b>Pro</b></div><div class="chip" id="chip">Видео не выбрано</div></header>
+<div class="grid">
+<div class="sticky"><div class="card">
+ <h3><i>1</i>Видео и предпросмотр</h3>
+ <div class="stage"><div class="empty" id="emp" role="button"><span class="ic">🎬</span><b>Выбрать видео</b>MP4 / MOV из Фото или Файлов</div><canvas id="pv"></canvas></div>
+ <div class="bar2 hide" id="pbar"><button id="pp">⏯ Пауза</button><button id="chg">Другое видео</button><span id="info"></span></div>
+</div></div>
+<div>
+ <div class="card"><h3><i>2</i>Формат</h3>
+  <div class="seg" id="fmt"><button data-v="9:16" class="on">9:16<small>Shorts · TikTok</small></button><button data-v="4:5">4:5<small>Reels · IG</small></button><button data-v="1:1">1:1<small>Квадрат</small></button><button data-v="16:9">16:9<small>YouTube</small></button></div>
+  <div class="lbl">Вписывание кадра</div>
+  <div class="seg" id="fit"><button data-v="smart" class="on">Умный</button><button data-v="fill">Кроп</button><button data-v="blur">Размытый фон</button></div>
+ </div>
+ <div class="card"><h3><i>3</i>Уникализация</h3>
+  <div class="seg" id="lvl"><button data-v="1">Лёгкий</button><button data-v="2" class="on">Средний</button><button data-v="3">Сильный</button></div>
+  <div class="tg"><span>Зеркальное отражение</span><button class="sw" id="mir"></button></div>
+  <div class="lbl" style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">Профиль метаданных <button class="b2" id="re" style="padding:6px 12px;font-size:13px">🎲 Новый</button></div>
+  <dl id="prof"></dl>
+ </div>
+ <button class="go" id="go" disabled>Уникализировать</button>
+ <div class="card hide" id="pc" style="margin-top:14px"><div class="st"><b id="stt">Обработка…</b><b id="pct">0%</b></div><div class="bar"><i id="pb"></i></div><div class="st"><span id="el">Прошло 0:00</span><span id="eta">Осталось —</span></div><p class="note">Держите экран включённым и вкладку открытой. Статус обновляется раз в секунду.</p></div>
+ <div class="card hide" id="rc" style="margin-top:14px"><h3><i>✓</i>Готово</h3><video id="out" controls playsinline></video>
+  <div class="g2"><button class="go" id="sv" style="padding:14px;font-size:15px">📲 В Фото</button><button class="b2" id="dl">⬇️ Скачать</button></div>
+  <p class="note" id="rn"></p></div>
+ <p class="note">Видео пересобирается заново, меняются хеш, кодирование, кадр, звук, даты, устройство (Make/Model), ПО, GPS, название и служебные блоки файла. Всё происходит на вашем устройстве.</p>
+</div></div></div>
+<script>
+const $=id=>document.getElementById(id),R=(a,b)=>a+Math.random()*(b-a),P=a=>a[Math.floor(Math.random()*a.length)],E=new TextEncoder();
+const FM={'9:16':[1080,1920],'4:5':[1080,1350],'1:1':[1080,1080],'16:9':[1920,1080]};
+const DEV=[['Apple','iPhone 15 Pro','17.5.1'],['Apple','iPhone 14','17.2'],['Apple','iPhone 13','16.7.2'],['Samsung','SM-S918B','Android 14'],['Google','Pixel 8','Android 14'],['Xiaomi','2201123G','Android 13']];
+const GEO=[[40.71,-74.0],[51.5,-0.12],[55.75,37.61],[48.85,2.35],[25.2,55.27],[50.45,30.52],[41.9,12.49],[52.52,13.4]];
+const st={fmt:'9:16',fit:'smart',lvl:2,mirror:false,busy:false,file:null,pv:null};
+let prof,blob,outName;
+const pc=$('pv'),px=pc.getContext('2d'),sm=document.createElement('canvas');sm.width=18;sm.height=32;const sx=sm.getContext('2d');
+const fmt=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function seg(id,fn){$(id).onclick=e=>{const b=e.target.closest('button');if(!b||st.busy)return;[...$(id).children].forEach(x=>x.classList.remove('on'));b.classList.add('on');fn(b.dataset.v)}}
+function setCanvas(){const[W,H]=FM[st.fmt],s=560/Math.max(W,H);pc.width=Math.round(W*s);pc.height=Math.round(H*s)}
+seg('fmt',v=>{st.fmt=v;setCanvas()});seg('fit',v=>st.fit=v);seg('lvl',v=>{st.lvl=+v;mkProf()});
+$('mir').onclick=e=>{if(st.busy)return;st.mirror=!st.mirror;e.target.classList.toggle('on',st.mirror);prof.mirror=st.mirror};
+function mkProf(){
+ const k=st.lvl,d=new Date(Date.now()-R(2,90)*864e5),dev=P(DEV),g=P(GEO),p2=n=>String(n).padStart(2,'0');
+ const ds=`${d.getFullYear()}${p2(d.getMonth()+1)}${p2(d.getDate())}_${p2(d.getHours())}${p2(d.getMinutes())}${p2(d.getSeconds())}`;
+ const nm=dev[0]==='Apple'?'IMG_'+Math.floor(R(1000,9999)):dev[1].startsWith('Pixel')?'PXL_'+ds+Math.floor(R(100,999)):'VID_'+ds;
+ prof={dev,date:d,lat:g[0]+R(-.05,.05),lon:g[1]+R(-.05,.05),name:nm,zoom:1+R(.01,.012+.012*k),dx:R(-.01,.01)*k,dy:R(-.01,.01)*k,tint:[0,0,0].map(()=>Math.round(R(0,255))),ta:R(.008,.01+.008*k),noise:.012*k,gain:R(.96,1.04),vb:Math.round(R(5,7.5)*1e6),mirror:st.mirror};
+ $('prof').innerHTML=`<dt>Устройство</dt><dd>${dev[0]} ${dev[1]}</dd><dt>ПО</dt><dd>${dev[2]}</dd><dt>Создано</dt><dd>${d.toLocaleString('ru')}</dd><dt>GPS</dt><dd>${prof.lat.toFixed(4)}, ${prof.lon.toFixed(4)}</dd><dt>Файл</dt><dd>${nm}</dd><dt>Кадр</dt><dd>зум ${((prof.zoom-1)*100).toFixed(1)}% · ${(prof.vb/1e6).toFixed(1)} Мбит/с</dd>`;
+}
+function draw(x,W,H,v,noise){
+ const vw=v.videoWidth,vh=v.videoHeight,ar=vw/vh,tr=W/H,q=Math.max(ar/tr,tr/ar);let m=st.fit;if(m==='smart')m=q<1.25?'fill':'blur';
+ x.fillStyle='#000';x.fillRect(0,0,W,H);x.save();if(prof.mirror){x.translate(W,0);x.scale(-1,1)}
+ if(m==='blur'){sx.drawImage(v,0,0,18,32);x.drawImage(sm,0,0,W,H);x.fillStyle='rgba(0,0,0,.35)';x.fillRect(0,0,W,H)}
+ const s=(m==='blur'?Math.min(W/vw,H/vh):Math.max(W/vw,H/vh))*prof.zoom,w=vw*s,h=vh*s;
+ x.drawImage(v,(W-w)/2+prof.dx*W,(H-h)/2+prof.dy*H,w,h);x.restore();
+ const[r,g,b]=prof.tint;x.fillStyle=`rgba(${r},${g},${b},${prof.ta})`;x.fillRect(0,0,W,H);
+ if(noise){const k=W/1080;for(let i=0;i<40;i++){x.fillStyle=`rgba(255,255,255,${Math.random()*noise})`;x.fillRect(Math.random()*W,Math.random()*H,3*k,3*k)}}
+}
+(function loop(){if(st.pv&&!st.busy&&st.pv.readyState>1)draw(px,pc.width,pc.height,st.pv,0);requestAnimationFrame(loop)})();
+$('emp').onclick=()=>$('f').click();$('chg').onclick=()=>{$('f').value='';$('f').click()};
+$('f').onchange=e=>{const f=e.target.files[0];if(!f)return;st.file=f;
+ const v=document.createElement('video');v.src=URL.createObjectURL(f);v.muted=true;v.loop=true;v.playsInline=true;v.setAttribute('playsinline','');v.preload='auto';
+ v.onerror=()=>alert('Не удалось открыть это видео. Попробуйте MP4/MOV.');
+ v.onloadedmetadata=()=>{st.pv=v;v.play().catch(()=>{});setCanvas();pc.style.display='block';$('emp').classList.add('hide');$('pbar').classList.remove('hide');$('go').disabled=false;
+  $('info').textContent=`${v.videoWidth}×${v.videoHeight} · ${fmt(v.duration)}`;$('chip').textContent=f.name.slice(0,22);$('rc').classList.add('hide')};v.load()};
+$('pp').onclick=()=>{const v=st.pv;if(!v)return;if(v.paused){v.play();$('pp').textContent='⏯ Пауза'}else{v.pause();$('pp').textContent='▶️ Играть'}};
+$('re').onclick=()=>{if(!st.busy)mkProf()};mkProf();
+
+const u32=n=>new Uint8Array([n>>>24&255,n>>>16&255,n>>>8&255,n&255]);
+function box(t,...parts){const len=parts.reduce((a,p)=>a+p.length,0),o=new Uint8Array(8+len);o.set(u32(8+len));o.set(t,4);let q=8;for(const p of parts){o.set(p,q);q+=p.length}return o}
+const qt=(c,s)=>{const b=E.encode(s);return box([0xA9,...E.encode(c)],new Uint8Array([b.length>>8,b.length&255,0x15,0xC7]),b)};
+function patch(buf){
+ const u=new Uint8Array(buf),dv=new DataView(buf),t=Math.floor(prof.date.getTime()/1000)+2082844800;
+ let pos=0,moov=-1,frag=false;
+ while(pos+8<=u.length){const s=dv.getUint32(pos),ty=String.fromCharCode(u[pos+4],u[pos+5],u[pos+6],u[pos+7]);if(ty==='moov')moov=pos;if(ty==='moof')frag=true;if(s<8)break;pos+=s}
+ if(moov<0)return new Blob([buf],{type:'video/mp4'});
+ const ms=dv.getUint32(moov);
+ for(let i=moov+8;i<moov+ms-24;i++){if(u[i]!==109&&u[i]!==116)continue;
+  const tg=String.fromCharCode(u[i],u[i+1],u[i+2],u[i+3]);
+  if(tg==='mvhd'||tg==='tkhd'||tg==='mdhd'){const o=i+8;
+   if(u[i+4]===0){dv.setUint32(o,t);dv.setUint32(o+4,t+Math.floor(R(0,4)))}
+   else{dv.setUint32(o,0);dv.setUint32(o+4,t);dv.setUint32(o+8,0);dv.setUint32(o+12,t)}}}
+ let out=u;
+ if(frag){const d=prof.dev,iso=prof.date.toISOString().replace(/\.\d+Z/,'+0000');
+  const f=(n,w)=>Math.abs(n).toFixed(4).padStart(w,'0'),gps=(prof.lat>=0?'+':'-')+f(prof.lat,7)+(prof.lon>=0?'+':'-')+f(prof.lon,8)+'/';
+  const ud=box(E.encode('udta'),qt('mak',d[0]),qt('mod',d[1]),qt('swr',d[2]),qt('day',iso),qt('xyz',gps),qt('nam',prof.name),qt('too',d[0]+' Camera'));
+  const nu=new Uint8Array(u.length+ud.length);nu.set(u.subarray(0,moov+ms));nu.set(ud,moov+ms);nu.set(u.subarray(moov+ms),moov+ms+ud.length);
+  new DataView(nu.buffer).setUint32(moov,ms+ud.length);out=nu}
+ return new Blob([out,box(E.encode('free'),crypto.getRandomValues(new Uint8Array(Math.floor(R(24,96)))))],{type:'video/mp4'});
+}
+
+async function run(){
+ if(st.busy||!st.file)return;st.busy=true;$('go').disabled=true;
+ $('pc').classList.remove('hide');$('rc').classList.add('hide');$('stt').textContent='Обработка…';
+ if(st.pv)st.pv.pause();
+ const url=URL.createObjectURL(st.file),v=document.createElement('video');v.src=url;v.playsInline=true;v.preload='auto';
+ try{await new Promise((ok,no)=>{v.onloadedmetadata=ok;v.onerror=no})}catch(e){alert('Не удалось открыть видео');st.busy=false;$('go').disabled=false;return}
+ const[W,H]=FM[st.fmt],c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+ const AC=new(window.AudioContext||window.webkitAudioContext)(),dest=AC.createMediaStreamDestination();
+ try{const g=AC.createGain();g.gain.value=prof.gain;AC.createMediaElementSource(v).connect(g);g.connect(dest)}catch(e){}
+ const stream=c.captureStream(30);dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));
+ const mt=['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';
+ const rec=new MediaRecorder(stream,{mimeType:mt,videoBitsPerSecond:prof.vb,audioBitsPerSecond:128000}),ch=[];
+ rec.ondataavailable=e=>e.data.size&&ch.push(e.data);
+ const dur=v.duration,t0=performance.now();
+ const tick=setInterval(()=>{const p=Math.min(1,v.currentTime/dur);$('pb').style.width=p*100+'%';$('pct').textContent=Math.round(p*100)+'%';
+  $('el').textContent='Прошло '+fmt((performance.now()-t0)/1000);$('eta').textContent='Осталось '+fmt(dur-v.currentTime)},1000);
+ const fr=()=>{draw(x,W,H,v,prof.noise);v.requestVideoFrameCallback?v.requestVideoFrameCallback(fr):requestAnimationFrame(fr)};
+ await AC.resume();rec.start(1000);const done=new Promise(r=>v.onended=r);
+ await v.play().catch(()=>{});fr();await done;
+ $('stt').textContent='Запись метаданных…';rec.stop();await new Promise(r=>rec.onstop=r);clearInterval(tick);
+ const mp4=mt.includes('mp4'),buf=await new Blob(ch).arrayBuffer();
+ blob=mp4?patch(buf):new Blob([buf],{type:'video/webm'});outName=prof.name+(mp4?'.mp4':'.webm');
+ $('pb').style.width='100%';$('pct').textContent='100%';$('stt').textContent='Готово ✓';$('eta').textContent='Осталось 0:00';
+ $('out').src=URL.createObjectURL(blob);$('rc').classList.remove('hide');$('rn').textContent=`${outName} · ${(blob.size/1048576).toFixed(1)} МБ · ${prof.dev[0]} ${prof.dev[1]}`;
+ $('rc').scrollIntoView({behavior:'smooth'});
+ URL.revokeObjectURL(url);AC.close();st.busy=false;$('go').disabled=false;if(st.pv)st.pv.play();mkProf();
+}
+$('go').onclick=run;
+function dl(){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=outName;document.body.appendChild(a);a.click();a.remove()}
+$('sv').onclick=async()=>{const f=new File([blob],outName,{type:blob.type});
+ try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){if(e.name==='AbortError')return}dl()};
+$('dl').onclick=async()=>{try{if(typeof claude!=='undefined'){const d=await claude.use('downloads');if(d){await d.save({filename:outName,data:blob});return}}}catch(e){}dl()};
+</script></body></html>
